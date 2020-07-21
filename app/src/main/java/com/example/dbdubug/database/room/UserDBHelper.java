@@ -12,29 +12,37 @@ import java.util.List;
 
 public class UserDBHelper {
 
-//    private final AppDatabase appDatabase;
+    private final AppDatabase appDatabase;
     private final AppDatabase inMemoryAppDatabase;
 
     public UserDBHelper(Context context) {
-//        appDatabase = Room.databaseBuilder(context, AppDatabase.class, "User.db")
-//                .allowMainThreadQueries()
-//                .build();
+        appDatabase = Room.databaseBuilder(context, AppDatabase.class, "User.db")
+                .allowMainThreadQueries()
+                .build();
         inMemoryAppDatabase = Room.inMemoryDatabaseBuilder(context, AppDatabase.class)
                 .allowMainThreadQueries()
                 .build();
     }
 
     public void insertUser(List<User> userList) {
-//        appDatabase.userDao().insertAll(userList);
+        appDatabase.userDao().insertAll(userList);
+    }
+    
+    public List<User> getUser() {
+	    return appDatabase.userDao().loadAll();
     }
 
     public void insertUserInMemory(List<User> userList) {
         inMemoryAppDatabase.userDao().insertAll(userList);
     }
+	
+	public List<User> getUserInMemory() {
+		return inMemoryAppDatabase.userDao().loadAll();
+	}
 
-//    public int count() {
-//        return appDatabase.userDao().loadAll().size();
-//    }
+    public int count() {
+        return appDatabase.userDao().loadAll().size();
+    }
 
     public int countInMemory() {
         return inMemoryAppDatabase.userDao().loadAll().size();

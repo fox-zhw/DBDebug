@@ -5,10 +5,14 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.HandlerThread;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
 
 import com.example.dbdubug.database.CarDBHelper;
 import com.example.dbdubug.database.ContactDBHelper;
@@ -20,15 +24,27 @@ import com.example.dbdubug.utils.Utils;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
-	public static final String TAG = "MainActivity";
+	public static final String TAG = "TTTTT";
+	
+	Handler mHandler;
+	
+	UserDBHelper userDBHelper;
+	
 	@SuppressLint("CommitPrefEdits")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		
+		((TextView)findViewById(R.id.tv_address)).setText(Utils.showDebugDBAddressLogToast(getApplicationContext()));
+		
+		HandlerThread handlerThread = new HandlerThread("handler thread");
+		handlerThread.start();
+		mHandler = new Handler(handlerThread.getLooper());
 		
 		Set<String> stringSet = new HashSet<>();
 		stringSet.add("SetOne");
@@ -82,22 +98,22 @@ public class MainActivity extends AppCompatActivity {
 		}
 		
 		// Room database
-		UserDBHelper userDBHelper = new UserDBHelper(getApplicationContext());
-//		if (userDBHelper.count() == 0) {
-//			List<User> userList = new ArrayList<>();
-//			for (int i = 0; i < 20; i++) {
-//				User user = new User();
-//				user.id = (long)(i + 1);
-//				user.name = "user_" + i;
-//				userList.add(user);
-//			}
-//			userDBHelper.insertUser(userList);
-//		}
+		userDBHelper = new UserDBHelper(getApplicationContext());
+		if (userDBHelper.count() == 0) {
+			List<User> userList = new ArrayList<>();
+			for (int i = 0; i < 5; i++) {
+				User user = new User();
+				user.id = (long)(i + 1);
+				user.name = "user_" + i;
+				userList.add(user);
+			}
+			userDBHelper.insertUser(userList);
+		}
 		
 		// Room inMemory database
 		if (userDBHelper.countInMemory() == 0) {
 			List<User> userList = new ArrayList<>();
-			for (int i = 0; i < 20; i++) {
+			for (int i = 0; i < 5; i++) {
 				User user = new User();
 				user.id = (long)(i + 1);
 				user.name = "in_memory_user_" + i;
@@ -108,18 +124,35 @@ public class MainActivity extends AppCompatActivity {
 		
 		Utils.setCustomDatabaseFiles(getApplicationContext());
 		Utils.setInMemoryRoomDatabases(userDBHelper.getInMemoryDatabase());
-		
-		NetworkUtils.getInstance().init(getApplicationContext());
-		NetworkUtils.getInstance().addNetworkStateListener(new NetworkUtils.INetworkStateListener() {
-			@Override
-			public void onNetworkState(int netState, int type) {
-				Log.e(TAG, "onNetworkState: " + netState);
-				Log.e(TAG, "onNetworkState: " + type);
-			}
-		});
 	}
 	
-	public void showDebugDbAddress(View view) {
-		Utils.showDebugDBAddressLogToast(getApplicationContext());
+	public void click(View view) {
+		switch (view.getId()) {
+			case R.id.bt_user:
+				mHandler.post(new Runnable() {
+					@Override
+					public void run() {
+						List<User> user = userDBHelper.getUser();
+						Log.w(TAG, "getUser: " + user.toString());
+					}
+				});
+				break;
+			case R.id.bt_user_memory:
+				mHandler.post(new Runnable() {
+					@Override
+					public void run() {
+						List<User> user = userDBHelper.getUserInMemory();
+						Log.w(TAG, "getUserInMemory: " + user.toString());
+					}
+				});
+				break;
+			case R.id.bt_shared_preferences:
+				SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+				Map<String, ?> all = sharedPreferences.getAll();
+				Log.w(TAG, "SharedPreferences: " + all.toString());
+				break;
+			default:
+				break;
+		}
 	}
 }

@@ -41,17 +41,20 @@ public class Utils {
         // This class is not publicly instantiable
     }
 
-    public static void showDebugDBAddressLogToast(Context context) {
+    public static String showDebugDBAddressLogToast(Context context) {
         if (BuildConfig.DEBUG) {
             try {
                 Class<?> debugDB = Class.forName("com.amitshekhar.DebugDB");
                 Method getAddressLog = debugDB.getMethod("getAddressLog");
                 Object value = getAddressLog.invoke(null);
                 Toast.makeText(context, (String) value, Toast.LENGTH_LONG).show();
+                
+                return (String) value;
             } catch (Exception ignore) {
 
             }
         }
+	    return "";
     }
 
     public static void setCustomDatabaseFiles(Context context) {
