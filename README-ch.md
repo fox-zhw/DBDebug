@@ -138,3 +138,8 @@ public static void setInMemoryRoomDatabases(SupportSQLiteDatabase... database) {
     }
 }
 ```
+
+### adb forward
+adb forward tcp:8080 tcp:9999
+adb forward --list
+adb forward --remove tcp:8080

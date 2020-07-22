@@ -15,7 +15,7 @@ android {
 
     buildTypes {
         debug {
-            resValue("string", "PORT_NUMBER", "8080")
+            resValue("string", "PORT_NUMBER", "8089")
             resValue("string", "DB_PASSWORD_PERSON", "a_password")
         }
         release {
@@ -33,7 +33,6 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 
-//    debugImplementation 'com.amitshekhar.android:debug-db:1.0.6'
     debugImplementation 'com.amitshekhar.android:debug-db-encrypt:1.0.6'
     implementation 'net.zetetic:android-database-sqlcipher:3.5.9'
 }
